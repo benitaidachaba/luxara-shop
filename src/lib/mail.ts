@@ -11,7 +11,7 @@ export async function sendConfirmation(receipt: Receipt) {
     if (!user || !password) return "not_configured";
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com", port: 465, secure: true,
-      auth: { user, pass: password },
+      auth: { user, pass: password.replace(/\s/g, "") },
       connectionTimeout: 10_000, greetingTimeout: 10_000, socketTimeout: 15_000,
     });
     await transporter.sendMail({ from: `Luxara <${user}>`, to: receipt.email, subject: `Your Luxara order request ${receipt.orderNumber}`, text: message });
