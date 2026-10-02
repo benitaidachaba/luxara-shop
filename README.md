@@ -14,7 +14,7 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000). The migration creates the tables and seeds 135 **sample** products: 15 each in Perfumes, Diffusers, Humidifiers, Aromatics, Furniture, Lighting, Objects, Textiles, and Accessories. Each category includes Nigerian and international examples. It can be run again safely, but rerunning it resets sample names and prices from the seed file.
 
-The site has separate pages for the [landing page](http://localhost:3000/), [collection](http://localhost:3000/collection), and [checkout](http://localhost:3000/checkout). Each sample product has its own SVG illustration matching its type and name, generated with `npm run art:generate` from `scripts/generate-art.ts`. These illustrations are clearly marked as sample art; replace them with verified product photos when real inventory is available. If changing product names in `src/lib/catalog-data.ts`, regenerate the art and rerun the migration.
+The site has separate pages for the [landing page](http://localhost:3000/), [collection](http://localhost:3000/collection), and [checkout](http://localhost:3000/checkout). Each sample product has its own AI-generated product photograph in `public/products/`. These are visual concepts for fictional sample listings, not verified photos of stock. Replace them with real product photos when inventory is available. If changing product names in `src/lib/catalog-data.ts`, update the corresponding image and rerun the migration.
 
 ## Environment
 
@@ -57,6 +57,6 @@ The Neon schema has already been created. If deploying to a different Neon datab
 
 The bag, products, customer accounts, sessions, orders, and order line items are stored in Neon. The server reads prices from the product table when placing an order and saves a price snapshot on each line item. Prices are displayed in Nigerian naira. The sample delivery policy is ₦5,000, or complimentary from ₦150,000; replace it with your real policy before launch.
 
-Product names, prices, origins, and illustrations are sample inventory. Replace them with verified stock before taking real customer orders. The storefront and checkout state this clearly.
+Product names, prices, origins, and AI-generated product images are sample inventory. Replace them with verified stock before taking real customer orders. The storefront and checkout state this clearly.
 
 Checkout currently places an **order request**. It does **not** charge a card; add a payment provider before accepting online payments. The page tells customers this before they place an order.

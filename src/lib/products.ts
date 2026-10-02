@@ -10,7 +10,7 @@ export const seedProducts = catalogGroups.flatMap(group => group.names.split("|"
   category: group.category,
   price: (group.base + group.step * index) * 100,
   color: colors[index % colors.length],
-  image: `/products/${slug(name)}.svg`,
+  image: `/products/${slug(name)}.webp`,
   tag: index === 0 ? "Featured" : index === 1 ? "New" : "",
   description: group.description,
   originCountry: countries[index],
