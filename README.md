@@ -24,7 +24,7 @@ The site has separate pages for the [landing page](http://localhost:3000/), [col
 | `APP_URL` | Public app origin, such as `http://localhost:3000` or your deployed HTTPS origin. |
 | `GOOGLE_CLIENT_ID` | Web application OAuth client ID from Google Cloud Console. |
 | `GOOGLE_CLIENT_SECRET` | Secret for that OAuth client. |
-| `MAILGUN_API_KEY` | Mailgun private API key. |
+| `MAILGUN_API_KEY` | Mailgun Domain Sending Key for the configured sending domain. |
 | `MAILGUN_DOMAIN` | Verified sending domain in Mailgun. |
 | `MAILGUN_FROM` | Sender address on that domain, optionally with a display name. |
 | `MAILGUN_REGION` | `us` or `eu`; defaults to `us`. |
