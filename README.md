@@ -1,6 +1,6 @@
 # Luxara
 
-A fragrance and lifestyle storefront built with Next.js, Neon Postgres, Google sign-in, and Mailgun order confirmations.
+A fragrance and lifestyle storefront built with Next.js, Neon Postgres, Google sign-in, and email order confirmations.
 
 ## Run locally
 
@@ -24,6 +24,9 @@ The site has separate pages for the [landing page](http://localhost:3000/), [col
 | `APP_URL` | Public app origin, such as `http://localhost:3000` or your deployed HTTPS origin. |
 | `GOOGLE_CLIENT_ID` | Web application OAuth client ID from Google Cloud Console. |
 | `GOOGLE_CLIENT_SECRET` | Secret for that OAuth client. |
+| `MAIL_PROVIDER` | Set to `gmail` for Gmail SMTP, or leave unset/use `mailgun` for Mailgun. |
+| `GMAIL_USER` | Full Gmail address used to send confirmations. Required when `MAIL_PROVIDER=gmail`. |
+| `GMAIL_APP_PASSWORD` | Google App Password for that address. Required when `MAIL_PROVIDER=gmail`; never use your normal Google password. |
 | `MAILGUN_API_KEY` | Mailgun Domain Sending Key for the configured sending domain. |
 | `MAILGUN_DOMAIN` | Verified sending domain in Mailgun. |
 | `MAILGUN_FROM` | Sender address on that domain, optionally with a display name. |
@@ -43,11 +46,15 @@ Verify a sending domain in [Mailgun](https://app.mailgun.com/), including its DN
 
 Mailgun sandbox domains can send only to recipients you authorize in Mailgun. The current local Mailgun domain is an active sandbox domain, so use it for testing and switch to a verified custom sending domain before accepting customer orders.
 
-After an order is saved, the server sends a plain text confirmation email and records `sent`, `failed`, or `not_configured` in `orders.email_status`. An email outage does not erase a placed order.
+## Gmail with Nodemailer
+
+For early testing without a sending domain, turn on [Google 2-Step Verification](https://myaccount.google.com/security), create an [App Password](https://myaccount.google.com/apppasswords), and set `MAIL_PROVIDER=gmail`, `GMAIL_USER` to your full Gmail address, and `GMAIL_APP_PASSWORD` to the App Password in `.env.local` and in Vercel Production environment variables. Do not use your normal Gmail password or put the App Password in source control. Gmail will send from the authenticated address. Gmail has daily sending limits and may block automated traffic, so use a dedicated transactional email provider for sustained customer traffic.
+
+After an order is saved, the server sends a plain text confirmation email through the selected provider and records `sent`, `failed`, or `not_configured` in `orders.email_status`. An email outage does not erase a placed order.
 
 ## Deploy on Vercel
 
-In the Vercel project, open **Settings → Environment Variables** and add `DATABASE_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `MAILGUN_API_KEY`, `MAILGUN_DOMAIN`, `MAILGUN_FROM`, and `MAILGUN_REGION` for **Production**. Set `APP_URL` to the site's permanent HTTPS origin, without a trailing slash (for example, `https://shop.example.com`). These values are separate from local `.env.local`; do not commit that file or add a `NEXT_PUBLIC_` prefix to secrets.
+In the Vercel project, open **Settings → Environment Variables** and add `DATABASE_URL`, `GOOGLE_CLIENT_ID`, and `GOOGLE_CLIENT_SECRET` for **Production**. For email, add either `MAIL_PROVIDER=gmail`, `GMAIL_USER`, and `GMAIL_APP_PASSWORD`, or the `MAILGUN_*` values listed above. Set `APP_URL` to the site's permanent HTTPS origin, without a trailing slash (for example, `https://shop.example.com`). These values are separate from local `.env.local`; do not commit that file or add a `NEXT_PUBLIC_` prefix to secrets.
 
 In the Google OAuth web client, add the exact production callback URL, for example `https://shop.example.com/api/auth/google/callback`, under **Authorized redirect URIs**. Keep the localhost callback too for local testing. Google matches the full URI exactly. If using Vercel Preview deployments, use a stable preview domain and register its exact callback separately; random deployment URLs will not match a single registered redirect URI.
 
