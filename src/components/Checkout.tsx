@@ -15,7 +15,21 @@ export default function Checkout({ customer, googleEnabled }: { customer: Custom
   const [busy, setBusy] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
   const [emailStatus, setEmailStatus] = useState("");
-  useEffect(() => { fetch("/api/cart").then(r => r.json()).then(setCart).catch(() => setError("Could not load your bag.")); }, []);
+  useEffect(() => {
+    if (orderNumber) return;
+    let active = true;
+    let loaded = false;
+    const refresh = () => {
+      if (document.visibilityState !== "visible") return;
+      fetch("/api/cart", { cache: "no-store" }).then(r => r.ok ? r.json() : null)
+        .then(data => { if (active && data) { loaded = true; setCart(data); } }).catch(() => { if (active && !loaded) setError("Could not load your bag."); });
+    };
+    refresh();
+    const timer = window.setInterval(refresh, 1500);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => { active = false; window.clearInterval(timer); window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", refresh); };
+  }, [orderNumber]);
 
   async function placeOrder(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault(); setBusy(true); setError("");

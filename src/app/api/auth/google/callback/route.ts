@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { cookieOptions, hashToken, newToken } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { getCartId } from "@/lib/cart";
+import { attachGuestCartToCustomer, getGuestCartId } from "@/lib/cart";
 
 export async function GET(request: Request) {
   const appUrl = process.env.APP_URL || new URL(request.url).origin;
@@ -31,10 +31,10 @@ export async function GET(request: Request) {
     const customerId = rows[0].id as string;
     const session = newToken();
     await sql`INSERT INTO sessions (token_hash, customer_id, expires_at) VALUES (${hashToken(session)}, ${customerId}, now() + interval '30 days')`;
-    const cartId = await getCartId();
-    if (cartId) await sql`UPDATE carts SET customer_id = ${customerId} WHERE id = ${cartId} AND customer_id IS NULL`;
+    await attachGuestCartToCustomer(customerId, await getGuestCartId());
     const response = NextResponse.redirect(new URL("/checkout", appUrl));
     response.cookies.set("ff_session", session, { ...cookieOptions, maxAge: 60 * 60 * 24 * 30 });
+    response.cookies.set("ff_cart", "", { ...cookieOptions, maxAge: 0 });
     return response;
   } catch { return NextResponse.redirect(new URL("/?auth=failed", appUrl)); }
 }

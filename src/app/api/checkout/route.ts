@@ -46,6 +46,8 @@ export async function POST(request: Request) {
         SELECT new_order.id, selected.product_id, selected.name, selected.price_cents, selected.quantity FROM new_order CROSS JOIN selected RETURNING product_id
       ) SELECT id FROM new_order`;
     if (!result.length) return NextResponse.json({ error: "Your bag is empty." }, { status: 400 });
+    if (customer) await sql`UPDATE customers SET active_cart_id = NULL
+      WHERE id = ${customer.id} AND active_cart_id = ${cartId}`;
     let emailStatus = "pending";
     try {
       emailStatus = await sendConfirmation({ orderNumber: number, email: f.email, name: f.fullName, items, total: subtotal + shipping });

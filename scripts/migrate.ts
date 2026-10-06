@@ -26,6 +26,7 @@ await sql`CREATE TABLE IF NOT EXISTS carts (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(), customer_id uuid REFERENCES customers(id) ON DELETE SET NULL,
   created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
 )`;
+await sql`ALTER TABLE customers ADD COLUMN IF NOT EXISTS active_cart_id uuid REFERENCES carts(id) ON DELETE SET NULL`;
 await sql`CREATE TABLE IF NOT EXISTS cart_items (
   cart_id uuid NOT NULL REFERENCES carts(id) ON DELETE CASCADE,
   product_id text NOT NULL REFERENCES products(id), quantity integer NOT NULL CHECK (quantity BETWEEN 1 AND 20),
@@ -48,6 +49,13 @@ await sql`CREATE TABLE IF NOT EXISTS order_items (
   price_cents integer NOT NULL, quantity integer NOT NULL,
   PRIMARY KEY (order_id, product_id)
 )`;
+await sql`UPDATE customers customer SET active_cart_id = (
+  SELECT cart.id FROM carts cart
+  WHERE cart.customer_id = customer.id AND NOT EXISTS (SELECT 1 FROM orders WHERE orders.cart_id = cart.id)
+  ORDER BY cart.updated_at DESC LIMIT 1
+) WHERE customer.active_cart_id IS NULL
+  AND EXISTS (SELECT 1 FROM carts cart WHERE cart.customer_id = customer.id
+    AND NOT EXISTS (SELECT 1 FROM orders WHERE orders.cart_id = cart.id))`;
 await sql`ALTER TABLE orders ALTER COLUMN status SET DEFAULT 'requested'`;
 const rows = seedProducts.map((product, sort_order) => ({
   id: product.id, name: product.name, category: product.category,

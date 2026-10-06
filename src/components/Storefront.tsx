@@ -32,7 +32,19 @@ export default function Storefront({ products, customer, googleEnabled, authMess
   const visible = shown.slice(0, visibleCount);
   const count = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
-  useEffect(() => { fetch("/api/cart").then(r => r.json()).then(setCart).catch(() => {}); }, []);
+  useEffect(() => {
+    let active = true;
+    const refresh = () => {
+      if (document.visibilityState !== "visible") return;
+      fetch("/api/cart", { cache: "no-store" }).then(r => r.ok ? r.json() : null)
+        .then(data => { if (active && data) setCart(data); }).catch(() => {});
+    };
+    refresh();
+    const timer = window.setInterval(refresh, 1500);
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => { active = false; window.clearInterval(timer); window.removeEventListener("focus", refresh); document.removeEventListener("visibilitychange", refresh); };
+  }, []);
 
   async function updateCart(productId: string, quantity: number) {
     setBusy(productId);
