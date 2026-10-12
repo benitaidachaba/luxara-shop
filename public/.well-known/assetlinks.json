@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.luxara.shop",
+      "sha256_cert_fingerprints": [
+        "85:42:AB:25:73:FE:52:BB:C8:01:7F:20:F2:17:7C:1F:63:27:A2:3B:7E:16:8C:D2:C5:72:BD:A8:F3:F1:2D:FC"
+      ]
+    }
+  }
+]

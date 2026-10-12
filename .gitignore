@@ -5,3 +5,11 @@ node_modules
 !.env.example
 .DS_Store
 *.tsbuildinfo
+android/.gradle/
+android/**/build/
+android/local.properties
+android/*.jks
+android/*.keystore
+android/*.apk
+android/*.aab
+android/*.idsig

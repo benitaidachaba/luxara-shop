@@ -67,3 +67,11 @@ The bag, products, customer accounts, sessions, orders, and order line items are
 Product names, prices, origins, and AI-generated product images are sample inventory. Replace them with verified stock before taking real customer orders. The storefront and checkout state this clearly.
 
 Checkout currently places an **order request**. It does **not** charge a card; add a payment provider before accepting online payments. The page tells customers this before they place an order.
+
+## Android APK
+
+Download the signed Android app at `https://luxara-shop.vercel.app/android`. It is a Trusted Web Activity for the same Luxara origin, so it uses the existing website API endpoints, Google account, and Neon cart. Cart changes sync while both clients are open (typically within about two seconds). Android needs Chrome and an internet connection.
+
+The Android source is in `android/`. Rebuild it with JDK 17, the Android SDK, and the Bubblewrap CLI from that directory using `bubblewrap build --skipPwaValidation`. Set `BUBBLEWRAP_KEYSTORE_PASSWORD` and `BUBBLEWRAP_KEY_PASSWORD` in your private environment first. Keep `android/android.keystore` and the passwords safely backed up; they are excluded from Git, and future APK updates must use the same key. After building, copy `android/app-release-signed.apk` to `public/luxara.apk`. If the key changes, update `public/.well-known/assetlinks.json` with the new certificate SHA-256 fingerprint and redeploy.
+
+Physical-phone verification remains to be completed on an Android device: install the APK from the download page, sign in using the same Google account as the website, add a product to the website cart, and confirm it appears in the app. Then add a product in the app and confirm it appears on the website. The build and browser synchronization tests cannot substitute for this device check.
